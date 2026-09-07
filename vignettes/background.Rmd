@@ -2,7 +2,7 @@
 title: "Background"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{background}
+  %\VignetteIndexEntry{Background}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
