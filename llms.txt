@@ -36,40 +36,48 @@ Computing a causal judgment requires three steps:
 
 -Request a causal judgment.
 
-For example, suppose that variable E happens if both A and B happen. We
-specify this causal model as:
+For example, suppose that Alice will graduate if she passes both her
+History and her Math exam. The Math exam is very difficult and the
+History exam is very easy.
+
+We specify this information as a causal model:
 
 ``` r
 
-causalmodel <- list(e='a&b', a=.1, b=.9)
+p_math <- .1 # probability of passing math exam
+p_history <- .9 # probability of passing history
+causal_rule <- 'history & math' # Alice passes if she passes history and math
+# collect the above information in a causal model
+causalmodel <- list(graduate=causal_rule, math=p_math, history=p_history)
 ```
 
-The string `'a&b'` specifies the structural equation for E. The numbers
-.1 and .9 are the exogenous probabilities for A and B.
+The string `'history & math'` specifies the structural equation for the
+`graduate` variable. The variables `history` and `math` each have an
+associated prior probability.
 
-Next we must specify what happens in the actual world:
+Next specify what happens in the actual world; Alice passed both History
+and Math, and she graduates:
 
 ``` r
-actual_world <- list(e=1, a=1, b=1).
-```
 
-This says that in the actual world, all variables have value 1. I.e. A
-happened, B happened, and E happened.
+actual_world <- list(graduate=1, math=1, history=1)
+```
 
 Finally we request a causal judgment:
 
 ``` r
 
-compute_judgment('a', 'e', causalmodel, actual_world, 'ces', .7)
+# to what extent did passing the math exam cause Alice to graduate?
+compute_judgment('math', 'graduate', causalmodel, actual_world, 'ces', .7)
 ```
 
-The first two arguments say that we want to see to what extent A caused
-E. The next two arguments specify the causal model and the actual-world
-value of the variables (defined above). The fifth argument specifies the
-computational model we want to use (here, CES). The last argument
-specifies the value of the stability parameter $`s`$ (how much
-counterfactual simulation is ‘anchored’ to the actual world). This
-argument is optional, by default $`s=0`$.
+The first two arguments say that we want to see to what extent `math`
+caused `graduate`. The next two arguments specify the causal model and
+the actual-world value of the variables (defined above). The fifth
+argument specifies the computational model we want to use (here, CES).
+The last argument specifies the value of the stability parameter $`s`$
+(how much counterfactual simulation is ‘anchored’ to the actual world).
+This argument is optional, by default $`s=0`$.
 
 Running this command will return a ‘causal score’ from -1 to 1 (for CES)
 or from 0 to 1 (for NS). Higher values indicate higher actual causal

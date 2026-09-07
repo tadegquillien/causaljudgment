@@ -18,88 +18,109 @@ library(causaljudgment)
 
 ## First example: simple conjunctive and disjunctive structures
 
-### conjunctive structure
+### Conjunctive structure
 
-We have A $`\rightarrow`$ E $`\leftarrow`$ B, and E happens if both A
-and B happen.
+Alice will graduate if she passes both her History AND her Math exam.
+The Math exam is very difficult and the History exam is very easy. She
+passes both exams and graduates. Did she graduate because she passed the
+Math exam or because she passed the History exam?
 
 Define the causal model and state of the actual world:
 
 ``` r
 
-# exogenous probabilitiy of A and B
-pa <- .1
-pb <- .9
+# exogenous probabilities
+p_math <- .1 # probability of passing math exam
+p_history <- .9 # probability of passing history
 
-# define the causal model
-conjModel <- list(e = "a & b", a = pa, b = pb)
+# structural equation
+causal_rule <- 'history & math' # Alice passes if she passes history and math
 
-# the values of variables in the actual world
-actual_world <- list(e = 1, a = 1, b = 1)
+# collect the above information in a causal model
+causalmodel <- list(graduate=causal_rule, math=p_math, history=p_history)
+
+# what happened in the actual world
+actual_world <- list(graduate=1, math=1, history=1)
 ```
 
-Compute causal judgment for A and B:
+Compute causal judgment for History and Math:
 
 ``` r
 
-# CES judgment for A (low-probability variable):
+# to what extent did passing the history exam (high-probability event) cause 
+# Alice to graduate?
 compute_judgment(
-  "a", "e", conjModel, actual_world, "ces", .7
-)
-#> [1] 0.9472197
-# CES judgment for B (high probability variable)
-compute_judgment(
-  "b", "e", conjModel, actual_world, "ces", .7
-)
+  'history', 'graduate', causalmodel, actual_world, 'ces', .7
+  )
 #> [1] 0.2739082
+
+# to what extent did passing the math exam (low-probability event) cause 
+# Alice to graduate?
+compute_judgment(
+  'math', 'graduate', causalmodel, actual_world, 'ces', .7
+  )
+#> [1] 0.9472197
 ```
 
-Judgment is higher for the low-probability variable; this reproduces a
+Judgment is higher for the low-probability event; this reproduces a
 classic effect in human judgments called ‘abnormal inflation’
-(e.g. Morris et al., 2019).
+(e.g. Morris et al., 2019; Kirfel et al., 2022).
 
-### disjunctive structure
+### Disjunctive structure
 
-Now E happens if either A or B happen.
+This scenario is the same as above, except that Alice needs to pass
+either the Math exam OR the History exam in order to graduate:
 
 ``` r
 
+# new structural equation
+disjunctive_rule <- 'history | math'
+# causal model
+causalmodel_disjunctive <- list(graduate=disjunctive_rule, history=p_history,
+                                 math=p_math)
 
-# define the causal model
-disjModel <- list(e = "a | b", a = pa, b = pb)
-
-# CES judgment for A (low-probability):
+# to what extent did passing the history exam (high-probability event) cause 
+# Alice to graduate?
 compute_judgment(
-  "a", "e", disjModel, actual_world, "ces", .7
-)
-#> [1] 0.1485895
-# CES judgment for B (high-probability):
-compute_judgment(
-  "b", "e", disjModel, actual_world, "ces", .7
-)
+  'history', 'graduate', causalmodel_disjunctive, actual_world, 'ces', .7
+  )
 #> [1] 0.513847
+
+# to what extent did passing the math exam (low-probability event) cause 
+# Alice to graduate?
+compute_judgment(
+  'math', 'graduate', causalmodel_disjunctive, actual_world, 'ces', .7
+  )
+#> [1] 0.1485895
 ```
 
-Now judgment is higher for the high-probability variable! This is called
-abnormal deflation, and was found in human participants by Icard and
-colleagues (2017).
+Now judgment is higher for the high-probability variable! This effect is
+called abnormal deflation, and was found in human participants by Icard
+and colleagues (2017).
 
-The Necessity-Sufficient model also reproduces these effects:
+The Necessity-Sufficiency model also reproduces these effects:
 
 ``` r
 
-# A, conjunctive structure
-compute_judgment('a', 'e', conjModel, actual_world, 'ns') 
-#> [1] 0.99
-# B, conjunctive structure
-compute_judgment('b', 'e', conjModel, actual_world, 'ns') 
+# conjunctive structure
+compute_judgment(
+  'history', 'graduate', causalmodel, actual_world, 'ns'
+  )
 #> [1] 0.19
-# A, disjunctive structure
-compute_judgment('a', 'e', disjModel, actual_world, 'ns') 
-#> [1] 0.1
-# B, disjunctive structure
-compute_judgment('b', 'e', disjModel, actual_world, 'ns') 
+compute_judgment(
+  'math', 'graduate', causalmodel, actual_world, 'ns'
+  )
+#> [1] 0.99
+
+# disjunctive structure
+compute_judgment(
+  'history', 'graduate', causalmodel_disjunctive, actual_world, 'ns'
+  )
 #> [1] 0.9
+compute_judgment(
+  'math', 'graduate', causalmodel_disjunctive, actual_world, 'ces', .7
+  )
+#> [1] 0.1485895
 ```
 
 ## Experiments in Quillien & Lucas (2023)
@@ -154,13 +175,13 @@ compute_judgment('b', 'e', causal_model, actual_world2b, 'ces', s=.7)
 
 ## Confounded models
 
-### simple confounded model
+### Simple confounded model
 
 In the model E $`\leftarrow`$ A $`\rightarrow`$ C, C and E are
 correlated, but C is not a cause of E. We check that the CES model makes
 the appropriate prediction.
 
-Define causal model and actual world
+Define causal model and actual world:
 
 ``` r
 
@@ -180,7 +201,7 @@ compute_judgment('c', 'e', causal_model, actual_world, 'ces', s=.7)
 #> [1] 0
 ```
 
-### more complicated confounded model
+### More complicated confounded model
 
 In this model, we have C $`\rightarrow`$ E $`\leftarrow`$ A, and A
 $`\rightarrow`$ C $`\leftarrow`$ B. That is, C has some causal effect on
@@ -339,14 +360,13 @@ pb <- .5 # Billy throws with .5 probability
 p_uae <- .6 # Alice's rock reaches bottle with .6 probability
 p_ube <- .9 # Billy's rock reaches bottle with .9 probability
 
-# the structural equation for E: E happens if A and U_a->e happen or if B and U_b->e happen
+# the structural equation for E: E happens if A and U_a->e happen or if B and
+# U_b->e happen
 equation_e <- 'a&uae | b&ube'
 
 # define the causal model
 causal_model <- list(e=equation_e, a=pa, b=pb,
                      uae=p_uae, ube=p_ube)
-
-#
 ```
 
 Request CES causal judgments for A and B. We assume that we can see that
@@ -375,7 +395,8 @@ events. We can model the effect of time by assuming that people are more
 likely to simulate alternatives to recent relative to early events.
 
 We implement this by assuming that the stability parameter $`s`$ is
-time-dependent (lower stability for recent events).
+time-dependent (lower stability for recent events), as in Quillien et
+al. (2025).
 
 We first consider a basketball game where Alice and Billy end up winning
 the game 2 to 1. Alice scored the first point and Billy scored the
@@ -402,7 +423,8 @@ compute_stability <- function(time){
 }
 
 # stability parameters 
-s_list <- list(a=compute_stability(ta), b=compute_stability(tb), c=compute_stability(tc), d=.5)
+s_list <- list(a=compute_stability(ta), b=compute_stability(tb), 
+               c=compute_stability(tc), d=.5)
 
 # condition for victory
 equation_e <- 'a+b > c+d'
@@ -419,12 +441,12 @@ Compute causal judgment for A and B:
 
 ``` r
 
-# CES judgment for A (early variable):
+# CES judgment for A (early event):
 compute_judgment(
   "a", "e", gameModel, actual_world, "ces", s_list
 )
 #> [1] 0.3902073
-# CES judgment for B (late variable)
+# CES judgment for B (late event)
 compute_judgment(
   "b", "e", gameModel, actual_world, "ces", s_list
 )
@@ -451,12 +473,12 @@ s_list <- list(a=compute_stability(ta), b=compute_stability(tb), c=.5, d=.5)
 # the values of variables in the actual world
 actual_world <- list(e = 1, a = 1, b = 1, c=0, d=0)
 
-# CES judgment for A (early variable):
+# CES judgment for A (early event):
 compute_judgment(
   "a", "e", gameModel, actual_world, "ces", s_list
 )
 #> [1] 0.474478
-# CES judgment for B (late variable)
+# CES judgment for B (late event)
 compute_judgment(
   "b", "e", gameModel, actual_world, "ces", s_list
 )
@@ -464,3 +486,36 @@ compute_judgment(
 ```
 
 Now Alice scoring the first point is the most important cause.
+
+## References
+
+Henne, P., Kulesza, A., Perez, K., & Houcek, A. (2021). Counterfactual
+thinking and recency effects in causal judgment. *Cognition*, 212,
+104708.
+
+Icard, T. F., Kominsky, J. F., & Knobe, J. (2017). Normality and actual
+causal strength. *Cognition*, 161, 80-93.
+
+Kirfel, L., Icard, T., & Gerstenberg, T. (2022). Inference from
+explanation. *Journal of Experimental Psychology: General*, 151(7),
+1481.
+
+Morris, A., Phillips, J., Gerstenberg, T., & Cushman, F. (2019).
+Quantitative causal selection patterns in token causation. *PLoS One*,
+14(8), e0219704.
+
+O’Neill, K., Quillien, T., & Henne, P. (2022). A counterfactual model of
+causal judgment in double prevention. *Conference in computational
+cognitive neuroscience*.
+
+O’Neill, K., Henne, P., Quillien, T., Icard, T., & DeBrigard, F. (2025).
+Norms moderate causal judgments in cases of double prevention.
+*Proceedings of the Annual Meeting of the Cognitive Science Society*
+(Vol. 47).
+
+Quillien, T., & Lucas, C. (2023). Counterfactuals and the logic of
+causal selection. *Psychological Review*.
+
+Quillien, T., O’Neill, K., & Henne, P. (2025). A counterfactual
+explanation for recency effects in double prevention scenarios:
+commentary on Thanawala and Erb (2024). *Cognition*, 106106.

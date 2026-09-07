@@ -97,76 +97,94 @@ not yet been tested!).</p>
 <h2 id="first-example-simple-conjunctive-and-disjunctive-structures">First example: simple conjunctive and disjunctive structures<a class="anchor" aria-label="anchor" href="#first-example-simple-conjunctive-and-disjunctive-structures"></a>
 </h2>
 <div class="section level3">
-<h3 id="conjunctive-structure">conjunctive structure<a class="anchor" aria-label="anchor" href="#conjunctive-structure"></a>
+<h3 id="conjunctive-structure">Conjunctive structure<a class="anchor" aria-label="anchor" href="#conjunctive-structure"></a>
 </h3>
-<p>We have A
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math>
-E
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>←</mo><annotation encoding="application/x-tex">\leftarrow</annotation></semantics></math>
-B, and E happens if both A and B happen.</p>
+<p>Alice will graduate if she passes both her History AND her Math exam.
+The Math exam is very difficult and the History exam is very easy. She
+passes both exams and graduates. Did she graduate because she passed the
+Math exam or because she passed the History exam?</p>
 <p>Define the causal model and state of the actual world:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># exogenous probabilitiy of A and B</span></span>
-<span><span class="va">pa</span> <span class="op">&lt;-</span> <span class="fl">.1</span></span>
-<span><span class="va">pb</span> <span class="op">&lt;-</span> <span class="fl">.9</span></span>
+<code class="sourceCode R"><span><span class="co"># exogenous probabilities</span></span>
+<span><span class="va">p_math</span> <span class="op">&lt;-</span> <span class="fl">.1</span> <span class="co"># probability of passing math exam</span></span>
+<span><span class="va">p_history</span> <span class="op">&lt;-</span> <span class="fl">.9</span> <span class="co"># probability of passing history</span></span>
 <span></span>
-<span><span class="co"># define the causal model</span></span>
-<span><span class="va">conjModel</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>e <span class="op">=</span> <span class="st">"a &amp; b"</span>, a <span class="op">=</span> <span class="va">pa</span>, b <span class="op">=</span> <span class="va">pb</span><span class="op">)</span></span>
+<span><span class="co"># structural equation</span></span>
+<span><span class="va">causal_rule</span> <span class="op">&lt;-</span> <span class="st">'history &amp; math'</span> <span class="co"># Alice passes if she passes history and math</span></span>
 <span></span>
-<span><span class="co"># the values of variables in the actual world</span></span>
-<span><span class="va">actual_world</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>e <span class="op">=</span> <span class="fl">1</span>, a <span class="op">=</span> <span class="fl">1</span>, b <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<p>Compute causal judgment for A and B:</p>
+<span><span class="co"># collect the above information in a causal model</span></span>
+<span><span class="va">causalmodel</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>graduate<span class="op">=</span><span class="va">causal_rule</span>, math<span class="op">=</span><span class="va">p_math</span>, history<span class="op">=</span><span class="va">p_history</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># what happened in the actual world</span></span>
+<span><span class="va">actual_world</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>graduate<span class="op">=</span><span class="fl">1</span>, math<span class="op">=</span><span class="fl">1</span>, history<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<p>Compute causal judgment for History and Math:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># CES judgment for A (low-probability variable):</span></span>
+<code class="sourceCode R"><span><span class="co"># to what extent did passing the history exam (high-probability event) cause </span></span>
+<span><span class="co"># Alice to graduate?</span></span>
 <span><span class="fu"><a href="../reference/compute_judgment.html">compute_judgment</a></span><span class="op">(</span></span>
-<span>  <span class="st">"a"</span>, <span class="st">"e"</span>, <span class="va">conjModel</span>, <span class="va">actual_world</span>, <span class="st">"ces"</span>, <span class="fl">.7</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0.9472197</span></span>
-<span><span class="co"># CES judgment for B (high probability variable)</span></span>
+<span>  <span class="st">'history'</span>, <span class="st">'graduate'</span>, <span class="va">causalmodel</span>, <span class="va">actual_world</span>, <span class="st">'ces'</span>, <span class="fl">.7</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 0.2739082</span></span>
+<span></span>
+<span><span class="co"># to what extent did passing the math exam (low-probability event) cause </span></span>
+<span><span class="co"># Alice to graduate?</span></span>
 <span><span class="fu"><a href="../reference/compute_judgment.html">compute_judgment</a></span><span class="op">(</span></span>
-<span>  <span class="st">"b"</span>, <span class="st">"e"</span>, <span class="va">conjModel</span>, <span class="va">actual_world</span>, <span class="st">"ces"</span>, <span class="fl">.7</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0.2739082</span></span></code></pre></div>
-<p>Judgment is higher for the low-probability variable; this reproduces
-a classic effect in human judgments called ‘abnormal inflation’
-(e.g. Morris et al., 2019).</p>
+<span>  <span class="st">'math'</span>, <span class="st">'graduate'</span>, <span class="va">causalmodel</span>, <span class="va">actual_world</span>, <span class="st">'ces'</span>, <span class="fl">.7</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 0.9472197</span></span></code></pre></div>
+<p>Judgment is higher for the low-probability event; this reproduces a
+classic effect in human judgments called ‘abnormal inflation’
+(e.g. Morris et al., 2019; Kirfel et al., 2022).</p>
 </div>
 <div class="section level3">
-<h3 id="disjunctive-structure">disjunctive structure<a class="anchor" aria-label="anchor" href="#disjunctive-structure"></a>
+<h3 id="disjunctive-structure">Disjunctive structure<a class="anchor" aria-label="anchor" href="#disjunctive-structure"></a>
 </h3>
-<p>Now E happens if either A or B happen.</p>
+<p>This scenario is the same as above, except that Alice needs to pass
+either the Math exam OR the History exam in order to graduate:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="co"># define the causal model</span></span>
-<span><span class="va">disjModel</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>e <span class="op">=</span> <span class="st">"a | b"</span>, a <span class="op">=</span> <span class="va">pa</span>, b <span class="op">=</span> <span class="va">pb</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># new structural equation</span></span>
+<span><span class="va">disjunctive_rule</span> <span class="op">&lt;-</span> <span class="st">'history | math'</span></span>
+<span><span class="co"># causal model</span></span>
+<span><span class="va">causalmodel_disjunctive</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>graduate<span class="op">=</span><span class="va">disjunctive_rule</span>, history<span class="op">=</span><span class="va">p_history</span>,</span>
+<span>                                 math<span class="op">=</span><span class="va">p_math</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># CES judgment for A (low-probability):</span></span>
+<span><span class="co"># to what extent did passing the history exam (high-probability event) cause </span></span>
+<span><span class="co"># Alice to graduate?</span></span>
 <span><span class="fu"><a href="../reference/compute_judgment.html">compute_judgment</a></span><span class="op">(</span></span>
-<span>  <span class="st">"a"</span>, <span class="st">"e"</span>, <span class="va">disjModel</span>, <span class="va">actual_world</span>, <span class="st">"ces"</span>, <span class="fl">.7</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0.1485895</span></span>
-<span><span class="co"># CES judgment for B (high-probability):</span></span>
+<span>  <span class="st">'history'</span>, <span class="st">'graduate'</span>, <span class="va">causalmodel_disjunctive</span>, <span class="va">actual_world</span>, <span class="st">'ces'</span>, <span class="fl">.7</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 0.513847</span></span>
+<span></span>
+<span><span class="co"># to what extent did passing the math exam (low-probability event) cause </span></span>
+<span><span class="co"># Alice to graduate?</span></span>
 <span><span class="fu"><a href="../reference/compute_judgment.html">compute_judgment</a></span><span class="op">(</span></span>
-<span>  <span class="st">"b"</span>, <span class="st">"e"</span>, <span class="va">disjModel</span>, <span class="va">actual_world</span>, <span class="st">"ces"</span>, <span class="fl">.7</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0.513847</span></span></code></pre></div>
-<p>Now judgment is higher for the high-probability variable! This is
-called abnormal deflation, and was found in human participants by Icard
-and colleagues (2017).</p>
-<p>The Necessity-Sufficient model also reproduces these effects:</p>
+<span>  <span class="st">'math'</span>, <span class="st">'graduate'</span>, <span class="va">causalmodel_disjunctive</span>, <span class="va">actual_world</span>, <span class="st">'ces'</span>, <span class="fl">.7</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 0.1485895</span></span></code></pre></div>
+<p>Now judgment is higher for the high-probability variable! This effect
+is called abnormal deflation, and was found in human participants by
+Icard and colleagues (2017).</p>
+<p>The Necessity-Sufficiency model also reproduces these effects:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># A, conjunctive structure</span></span>
-<span><span class="fu"><a href="../reference/compute_judgment.html">compute_judgment</a></span><span class="op">(</span><span class="st">'a'</span>, <span class="st">'e'</span>, <span class="va">conjModel</span>, <span class="va">actual_world</span>, <span class="st">'ns'</span><span class="op">)</span> </span>
-<span><span class="co">#&gt; [1] 0.99</span></span>
-<span><span class="co"># B, conjunctive structure</span></span>
-<span><span class="fu"><a href="../reference/compute_judgment.html">compute_judgment</a></span><span class="op">(</span><span class="st">'b'</span>, <span class="st">'e'</span>, <span class="va">conjModel</span>, <span class="va">actual_world</span>, <span class="st">'ns'</span><span class="op">)</span> </span>
+<code class="sourceCode R"><span><span class="co"># conjunctive structure</span></span>
+<span><span class="fu"><a href="../reference/compute_judgment.html">compute_judgment</a></span><span class="op">(</span></span>
+<span>  <span class="st">'history'</span>, <span class="st">'graduate'</span>, <span class="va">causalmodel</span>, <span class="va">actual_world</span>, <span class="st">'ns'</span></span>
+<span>  <span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0.19</span></span>
-<span><span class="co"># A, disjunctive structure</span></span>
-<span><span class="fu"><a href="../reference/compute_judgment.html">compute_judgment</a></span><span class="op">(</span><span class="st">'a'</span>, <span class="st">'e'</span>, <span class="va">disjModel</span>, <span class="va">actual_world</span>, <span class="st">'ns'</span><span class="op">)</span> </span>
-<span><span class="co">#&gt; [1] 0.1</span></span>
-<span><span class="co"># B, disjunctive structure</span></span>
-<span><span class="fu"><a href="../reference/compute_judgment.html">compute_judgment</a></span><span class="op">(</span><span class="st">'b'</span>, <span class="st">'e'</span>, <span class="va">disjModel</span>, <span class="va">actual_world</span>, <span class="st">'ns'</span><span class="op">)</span> </span>
-<span><span class="co">#&gt; [1] 0.9</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/compute_judgment.html">compute_judgment</a></span><span class="op">(</span></span>
+<span>  <span class="st">'math'</span>, <span class="st">'graduate'</span>, <span class="va">causalmodel</span>, <span class="va">actual_world</span>, <span class="st">'ns'</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 0.99</span></span>
+<span></span>
+<span><span class="co"># disjunctive structure</span></span>
+<span><span class="fu"><a href="../reference/compute_judgment.html">compute_judgment</a></span><span class="op">(</span></span>
+<span>  <span class="st">'history'</span>, <span class="st">'graduate'</span>, <span class="va">causalmodel_disjunctive</span>, <span class="va">actual_world</span>, <span class="st">'ns'</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 0.9</span></span>
+<span><span class="fu"><a href="../reference/compute_judgment.html">compute_judgment</a></span><span class="op">(</span></span>
+<span>  <span class="st">'math'</span>, <span class="st">'graduate'</span>, <span class="va">causalmodel_disjunctive</span>, <span class="va">actual_world</span>, <span class="st">'ces'</span>, <span class="fl">.7</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 0.1485895</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -210,7 +228,7 @@ B:</p>
 <h2 id="confounded-models">Confounded models<a class="anchor" aria-label="anchor" href="#confounded-models"></a>
 </h2>
 <div class="section level3">
-<h3 id="simple-confounded-model">simple confounded model<a class="anchor" aria-label="anchor" href="#simple-confounded-model"></a>
+<h3 id="simple-confounded-model">Simple confounded model<a class="anchor" aria-label="anchor" href="#simple-confounded-model"></a>
 </h3>
 <p>In the model E
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>←</mo><annotation encoding="application/x-tex">\leftarrow</annotation></semantics></math>
@@ -218,7 +236,7 @@ A
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math>
 C, C and E are correlated, but C is not a cause of E. We check that the
 CES model makes the appropriate prediction.</p>
-<p>Define causal model and actual world</p>
+<p>Define causal model and actual world:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">causal_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>e<span class="op">=</span><span class="st">'a'</span>, a<span class="op">=</span><span class="fl">.9</span>, c<span class="op">=</span><span class="st">'a'</span><span class="op">)</span></span>
 <span><span class="va">actual_world</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>e<span class="op">=</span><span class="fl">1</span>, a<span class="op">=</span><span class="fl">1</span>, c<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
@@ -232,7 +250,7 @@ CES model makes the appropriate prediction.</p>
 <span><span class="co">#&gt; [1] 0</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="more-complicated-confounded-model">more complicated confounded model<a class="anchor" aria-label="anchor" href="#more-complicated-confounded-model"></a>
+<h3 id="more-complicated-confounded-model">More complicated confounded model<a class="anchor" aria-label="anchor" href="#more-complicated-confounded-model"></a>
 </h3>
 <p>In this model, we have C
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math>
@@ -371,14 +389,13 @@ succeeded).</p>
 <span><span class="va">p_uae</span> <span class="op">&lt;-</span> <span class="fl">.6</span> <span class="co"># Alice's rock reaches bottle with .6 probability</span></span>
 <span><span class="va">p_ube</span> <span class="op">&lt;-</span> <span class="fl">.9</span> <span class="co"># Billy's rock reaches bottle with .9 probability</span></span>
 <span></span>
-<span><span class="co"># the structural equation for E: E happens if A and U_a-&gt;e happen or if B and U_b-&gt;e happen</span></span>
+<span><span class="co"># the structural equation for E: E happens if A and U_a-&gt;e happen or if B and</span></span>
+<span><span class="co"># U_b-&gt;e happen</span></span>
 <span><span class="va">equation_e</span> <span class="op">&lt;-</span> <span class="st">'a&amp;uae | b&amp;ube'</span></span>
 <span></span>
 <span><span class="co"># define the causal model</span></span>
 <span><span class="va">causal_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>e<span class="op">=</span><span class="va">equation_e</span>, a<span class="op">=</span><span class="va">pa</span>, b<span class="op">=</span><span class="va">pb</span>,</span>
-<span>                     uae<span class="op">=</span><span class="va">p_uae</span>, ube<span class="op">=</span><span class="va">p_ube</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">#</span></span></code></pre></div>
+<span>                     uae<span class="op">=</span><span class="va">p_uae</span>, ube<span class="op">=</span><span class="va">p_ube</span><span class="op">)</span></span></code></pre></div>
 <p>Request CES causal judgments for A and B. We assume that we can see
 that both causes were successful (e.g. that Alice and Billy both threw a
 rock at the bottle, and that both rocks successfully reached the
@@ -404,7 +421,8 @@ are more likely to simulate alternatives to recent relative to early
 events.</p>
 <p>We implement this by assuming that the stability parameter
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>s</mi><annotation encoding="application/x-tex">s</annotation></semantics></math>
-is time-dependent (lower stability for recent events).</p>
+is time-dependent (lower stability for recent events), as in Quillien et
+al. (2025).</p>
 <p>We first consider a basketball game where Alice and Billy end up
 winning the game 2 to 1. Alice scored the first point and Billy scored
 the second point. Claire (in the opposite team) scored sometime in
@@ -429,7 +447,8 @@ between.</p>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="co"># stability parameters </span></span>
-<span><span class="va">s_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>a<span class="op">=</span><span class="fu">compute_stability</span><span class="op">(</span><span class="va">ta</span><span class="op">)</span>, b<span class="op">=</span><span class="fu">compute_stability</span><span class="op">(</span><span class="va">tb</span><span class="op">)</span>, c<span class="op">=</span><span class="fu">compute_stability</span><span class="op">(</span><span class="va">tc</span><span class="op">)</span>, d<span class="op">=</span><span class="fl">.5</span><span class="op">)</span></span>
+<span><span class="va">s_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>a<span class="op">=</span><span class="fu">compute_stability</span><span class="op">(</span><span class="va">ta</span><span class="op">)</span>, b<span class="op">=</span><span class="fu">compute_stability</span><span class="op">(</span><span class="va">tb</span><span class="op">)</span>, </span>
+<span>               c<span class="op">=</span><span class="fu">compute_stability</span><span class="op">(</span><span class="va">tc</span><span class="op">)</span>, d<span class="op">=</span><span class="fl">.5</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># condition for victory</span></span>
 <span><span class="va">equation_e</span> <span class="op">&lt;-</span> <span class="st">'a+b &gt; c+d'</span></span>
@@ -442,12 +461,12 @@ between.</p>
 <span><span class="va">actual_world</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>e <span class="op">=</span> <span class="fl">1</span>, a <span class="op">=</span> <span class="fl">1</span>, b <span class="op">=</span> <span class="fl">1</span>, c<span class="op">=</span><span class="fl">1</span>, d<span class="op">=</span><span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p>Compute causal judgment for A and B:</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># CES judgment for A (early variable):</span></span>
+<code class="sourceCode R"><span><span class="co"># CES judgment for A (early event):</span></span>
 <span><span class="fu"><a href="../reference/compute_judgment.html">compute_judgment</a></span><span class="op">(</span></span>
 <span>  <span class="st">"a"</span>, <span class="st">"e"</span>, <span class="va">gameModel</span>, <span class="va">actual_world</span>, <span class="st">"ces"</span>, <span class="va">s_list</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0.3902073</span></span>
-<span><span class="co"># CES judgment for B (late variable)</span></span>
+<span><span class="co"># CES judgment for B (late event)</span></span>
 <span><span class="fu"><a href="../reference/compute_judgment.html">compute_judgment</a></span><span class="op">(</span></span>
 <span>  <span class="st">"b"</span>, <span class="st">"e"</span>, <span class="va">gameModel</span>, <span class="va">actual_world</span>, <span class="st">"ces"</span>, <span class="va">s_list</span></span>
 <span><span class="op">)</span></span>
@@ -469,17 +488,44 @@ and Billy’s team wins the game 2 to 0:</p>
 <span><span class="co"># the values of variables in the actual world</span></span>
 <span><span class="va">actual_world</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>e <span class="op">=</span> <span class="fl">1</span>, a <span class="op">=</span> <span class="fl">1</span>, b <span class="op">=</span> <span class="fl">1</span>, c<span class="op">=</span><span class="fl">0</span>, d<span class="op">=</span><span class="fl">0</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># CES judgment for A (early variable):</span></span>
+<span><span class="co"># CES judgment for A (early event):</span></span>
 <span><span class="fu"><a href="../reference/compute_judgment.html">compute_judgment</a></span><span class="op">(</span></span>
 <span>  <span class="st">"a"</span>, <span class="st">"e"</span>, <span class="va">gameModel</span>, <span class="va">actual_world</span>, <span class="st">"ces"</span>, <span class="va">s_list</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0.474478</span></span>
-<span><span class="co"># CES judgment for B (late variable)</span></span>
+<span><span class="co"># CES judgment for B (late event)</span></span>
 <span><span class="fu"><a href="../reference/compute_judgment.html">compute_judgment</a></span><span class="op">(</span></span>
 <span>  <span class="st">"b"</span>, <span class="st">"e"</span>, <span class="va">gameModel</span>, <span class="va">actual_world</span>, <span class="st">"ces"</span>, <span class="va">s_list</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0.4172687</span></span></code></pre></div>
 <p>Now Alice scoring the first point is the most important cause.</p>
+</div>
+<div class="section level2">
+<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
+<p>Henne, P., Kulesza, A., Perez, K., &amp; Houcek, A. (2021).
+Counterfactual thinking and recency effects in causal judgment.
+<i>Cognition</i>, 212, 104708.</p>
+<p>Icard, T. F., Kominsky, J. F., &amp; Knobe, J. (2017). Normality and
+actual causal strength. <i>Cognition</i>, 161, 80-93.</p>
+<p>Kirfel, L., Icard, T., &amp; Gerstenberg, T. (2022). Inference from
+explanation. <i>Journal of Experimental Psychology: General</i>, 151(7),
+1481.</p>
+<p>Morris, A., Phillips, J., Gerstenberg, T., &amp; Cushman, F. (2019).
+Quantitative causal selection patterns in token causation. <i>PLoS
+One</i>, 14(8), e0219704.</p>
+<p>O’Neill, K., Quillien, T., &amp; Henne, P. (2022). A counterfactual
+model of causal judgment in double prevention. <i>Conference in
+computational cognitive neuroscience</i>.</p>
+<p>O’Neill, K., Henne, P., Quillien, T., Icard, T., &amp; DeBrigard, F.
+(2025). Norms moderate causal judgments in cases of double prevention.
+<i>Proceedings of the Annual Meeting of the Cognitive Science
+Society</i> (Vol. 47).</p>
+<p>Quillien, T., &amp; Lucas, C. (2023). Counterfactuals and the logic
+of causal selection. <i>Psychological Review</i>.</p>
+<p>Quillien, T., O’Neill, K., &amp; Henne, P. (2025). A counterfactual
+explanation for recency effects in double prevention scenarios:
+commentary on Thanawala and Erb (2024). <i>Cognition</i>, 106106.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
