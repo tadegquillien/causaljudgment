@@ -6,7 +6,7 @@ distribution over counterfactual worlds
 ## Usage
 
 ``` r
-ns(var, outcome, actual_world, d, causal_model = cm)
+ns(var, outcome, actual_world, d, causal_model)
 ```
 
 ## Arguments
