@@ -1,6 +1,6 @@
 # causaljudgment
 
-The <code>causaljudgment</code> package allows one to compute the predictions of computational models of causal judgment. Currently two models are implemented: the Counterfactual Effect Size (CES) model (Quillien & Lucas, 2023) and the Necessity-Sufficiency (NS) model (Icard, Kominsky & Knobe, 2017).
+The <code>causaljudgment</code> package computes the predictions of computational models of causal judgment. Currently two models are implemented: the Counterfactual Effect Size (CES) model (Quillien & Lucas, 2023) and the Necessity-Sufficiency (NS) model (Icard, Kominsky & Knobe, 2017).
 
 In this file, we give examples of how to compute causal judgments, describe current limitations, and then (for interested readers) give a high-level explanation of how these scripts work. More background about when and why to use this package is given [here](https://tadegquillien.github.io/causaljudgment/articles/background.html). For the original scientific papers see [here (CES)](https://quillienlab.github.io/Quillien%20&%20Lucas%202023.pdf) and [here (NS)](https://philpapers.org/archive/ICANAA.pdf).
 
@@ -66,7 +66,10 @@ model we want to use (here, CES). The last argument specifies the value of the
 stability parameter $s$ (how much counterfactual simulation is 'anchored' to 
 the actual world). This argument is optional, by default $s=0$. 
 
-Running this command will return a 'causal score' from -1 to 1 (for CES) or from 0 to 1 (for NS). Higher values indicate higher actual causal strength. For the CES model, a negative value like -.8 indicates a very weak causal score, not something like 'negative' causation. And -.8 is weaker than for example -.4.
+Running this command will return a 'causal score' from -1 to 1 (for CES) or from
+0 to 1 (for NS). Higher values indicate higher actual causal strength. For the 
+CES model, a negative value like -.8 indicates a very weak causal score, not 
+something like 'negative' causation. And -.8 is weaker than for example -.4.
 
 More examples are provided in this [vignette](https://tadegquillien.github.io/causaljudgment/articles/examples.html).
 
@@ -92,17 +95,26 @@ On the positive side, any causal structure that can be expressed by an SCM with 
 We use an analytical approach to compute causal judgments for the CES and NS
 models. For background on how these models work see the references above.
 
-Our goal is to compute a causal judgment for the extent to which $C=c$ caused $E=e$. Instead of explicitly simulating counterfactual worlds by sampling
-from the SCM, we analytically compute the probability distribution
-over counterfactual worlds that would follow from this sampling process. This makes computation much faster.
-First it is useful to describe what this sampling process would look like
-(this will help understand what the analytical computation is trying to
+Our goal is to compute a causal judgment for the extent to which $C=c$ caused
+$E=e$. The models work by representing the causal structure as a Structural 
+Causal Model (SCM), and simulating counterfactual worlds from this SCM. Here, 
+instead of explicitly simulating counterfactual worlds by sampling from the SCM,
+we analytically compute the probability distribution over counterfactual worlds 
+that would follow from this sampling process. This makes computation much 
+faster. First it is useful to describe what this sampling process would look 
+like (this will help understand what the analytical computation is trying to
 formalize).
 
 We sample each counterfactual world by doing the following:
 
 1) Sample each exogenous variable according to the Lucas-Kemp process
-(see Lucas & Kemp, 2015; Quillien & Lucas, 2023).
+(see Lucas & Kemp, 2015; Quillien & Lucas, 2023). That is, each exogenous 
+variable $X$ is sampled with probability $s\mathbb{I}(X=x)+(1-s)P(X=x)$, where 
+$P(X=x)$ is the prior probability of $X=x$, $\mathbb{I}(X=x)$ is 1 if $X=x$ in 
+the actual world and 0 otherwise, and $s$ is a free 'stability' parameter 
+controlling to what extent the simulation process is biased to actual-world 
+values of the variables. For the NS model we typically use $s=0$; for the CES
+model values around $s=.7$ usually give a good fit to empirical data.
 
 2) If $C$ is endogenous, sample the value of $C$ by making a random intervention
 on $C$, where $C$ is sampled from $p(C)$. $p(C)$ is the marginal probability of $C$: it
