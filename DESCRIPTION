@@ -1,11 +1,14 @@
 Package: causaljudgment
 Title: Computational models of causal judgment
-Version: 0.0.0.9000
-Date: 2026-09-02
+Version: 0.1.0
+Date: 2026-09-08
 Authors@R: 
     person("Tadeg", "Quillien", , "tadeg.quillien@gmail.com", role = c("aut", "cre"))
-Description: Computational models of causal judgment.
-License: `use_mit_license()`
+Description: Provides computational implementations of models of causal judgment, including the Counterfactual Effect Size (CES) model of Quillien and Lucas (2023) <doi:10.1037/rev0000428>
+  and the Necessity-Sufficiency (NS) model of Icard, Kominsky and Knobe (2017) <doi:10.1016/j.cognition.2017.01.010>. 
+  The package represents causal structures as binary Structural Causal Models and
+  analytically computes causal judgments from counterfactual probability distributions.
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Suggests: 
@@ -17,4 +20,5 @@ Config/roxygen2/version: 8.1.0
 Imports: 
     dplyr
 VignetteBuilder: knitr
+BugReports: https://github.com/tadegquillien/causaljudgment/issues
 URL: https://tadegquillien.github.io/causaljudgment/

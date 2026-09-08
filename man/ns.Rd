@@ -4,7 +4,7 @@
 \alias{ns}
 \title{ns(): compute a judgment with the NS model.}
 \usage{
-ns(var, outcome, actual_world, d, causal_model = cm)
+ns(var, outcome, actual_world, d, causal_model)
 }
 \arguments{
 \item{var}{Character string giving the candidate cause variable.}

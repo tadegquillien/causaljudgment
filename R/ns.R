@@ -236,7 +236,7 @@ compute_sufficiency <- function(var, outcome, actual_world, causal_model, d){
 #'
 #' @export
 #'
-ns <- function(var, outcome,  actual_world, d, causal_model=cm){
+ns <- function(var, outcome,  actual_world, d, causal_model){
   # compute p(c) by filtering the df for C=aw(c), and summing across values of p
   pvar <- d %>% filter(!!sym(var)==actual_world[[var]]) %>% 
     summarize(s.p=sum(p)) %>% pull(s.p)
