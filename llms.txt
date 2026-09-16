@@ -135,7 +135,8 @@ sampling process. This makes computation much faster. First it is useful
 to describe what this sampling process would look like (this will help
 understand what the analytical computation is trying to formalize).
 
-We sample each counterfactual world by doing the following:
+For the CES model, we sample each counterfactual world by doing the
+following:
 
 1.  Sample each exogenous variable according to the Lucas-Kemp process
     (see Lucas & Kemp, 2015; Quillien & Lucas, 2023). That is, each
@@ -144,9 +145,8 @@ We sample each counterfactual world by doing the following:
     probability of $`X=x`$, $`\mathbb{I}(X=x)`$ is 1 if $`X=x`$ in the
     actual world and 0 otherwise, and $`s`$ is a free ‘stability’
     parameter controlling to what extent the simulation process is
-    biased to actual-world values of the variables. For the NS model we
-    typically use $`s=0`$; for the CES model values around $`s=.7`$
-    usually give a good fit to empirical data.
+    biased to actual-world values of the variables. Values around
+    $`s=.7`$ usually give a good fit to empirical data.
 
 2.  If $`C`$ is endogenous, sample the value of $`C`$ by making a random
     intervention on $`C`$, where $`C`$ is sampled from $`p(C)`$.
@@ -159,7 +159,8 @@ We sample each counterfactual world by doing the following:
 
 The distribution over counterfactual worlds that we wish to compute is
 the relative frequency of worlds simulated this way, as the number of
-samples goes to infinity.
+samples goes to infinity. For the NS model we do the same thing, except
+that we don’t perform step 2, and we typically set $`s=0`$ in step 1.
 
 To compute this probability distribution analytically, we do the
 following. We list each possible world (i.e. combination of variable
@@ -180,7 +181,7 @@ values) as a row in a table. We then assign a probability to each world:
 3.  We compute a probability $`p(w)`$ for the whole world by using the
     factorization defined by the network structure,
     i.e. $`p(w)=\prod_{V} p(V|\text{pa}(V))`$. Note that if $`V`$ is
-    exogenous then $`p(V|\text{pa}(V)) = p(V|\emptyset) = p(V)`$
+    exogenous then $`p(V|\text{pa}(V)) = p(V|\emptyset) = p(V)`$.
 
 4.  If $`C`$ is an endogenous variable, we must perform an additional
     step to ensure that the distribution reflects the fact that $`C`$’s
@@ -191,6 +192,8 @@ values) as a row in a table. We then assign a probability to each world:
     independent from the value of $`C`$’s parents, as required by the
     fact that $`C`$ is set by interventions. After doing this, we now
     re-compute the probability of each world.
+
+For the NS model we do the same thing but without step 4.
 
 After we have obtained the probability distribution over counterfactual
 worlds, it is easy to analytically compute the correlation between
