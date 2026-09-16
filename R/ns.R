@@ -194,9 +194,12 @@ compute_sufficiency <- function(var, outcome, actual_world, causal_model, d){
     
     # compute the value of E in the current world, given an intervention setting
     # C to its actual-world value
-    cf_probs$p_e1_cf[i] <- compute_counterfactual_value(
+    counterfactual_value <- compute_counterfactual_value(
       var, actual_world[[var]], outcome, causal_model, current_world
     )
+    # compute whether the counterfactual value of E matches its actual-world value
+    match <- counterfactual_value == actual_world[[outcome]]
+    cf_probs$p_e1_cf[i] <- match
     
   }
   
