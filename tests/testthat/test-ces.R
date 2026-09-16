@@ -57,3 +57,69 @@ test_that("CES handles conjunctive and disjunctive structures", {
     tolerance = 1e-7
   )
 })
+
+
+test_that("CES doesn't judge that E causes C", {
+  
+  cm <- list(
+    wet='rain',
+    rain='cloud',
+    cloud=.5
+  )
+  
+  actual_world <- list(
+    wet = 1,
+    rain = 1,
+    cloud = 1
+  )
+  
+  expect_equal(
+    compute_judgment(
+      "wet", "rain", cm, actual_world, "ces", .7
+    ),
+    0,
+    tolerance = 1e-7
+  )
+  
+  expect_equal(
+    compute_judgment(
+      "rain", "wet", cm, actual_world, "ces", .7
+    ),
+    1,
+    tolerance = 1e-7
+  )
+  
+})
+
+
+test_that("CES doesn't judge that ¬E causes ¬C", {
+  
+  cm <- list(
+    wet='rain',
+    rain='cloud',
+    cloud=.5
+  )
+  
+  actual_world <- list(
+    wet = 0,
+    rain = 0,
+    cloud = 0
+  )
+  
+  expect_equal(
+    compute_judgment(
+      "wet", "rain", cm, actual_world, "ces", .7
+    ),
+    0,
+    tolerance = 1e-7
+  )
+  
+  expect_equal(
+    compute_judgment(
+      "rain", "wet", cm, actual_world, "ces", .7
+    ),
+    1,
+    tolerance = 1e-7
+  )
+  
+})
