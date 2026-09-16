@@ -72,24 +72,29 @@ compute_judgment <- function(var, outcome, causal_model, actual_world,
   # enter joint probabilities
   df <- compute_probabilities(structural_functions, actual_world, s) 
   
-  # detect if C is endogenous
-  fun <- structural_functions[[var]] # extract function for C
-  args <- names(formals(fun)) # extract function arguments
-  # if variable is endogenous
-  if(length(args)>0){ 
-    # compute marginal probability
-    marginal_pvar <- sum(df[[var]]*df[[paste('p', var, sep='')]]*df$p)
-    # re-compute pc as the marginal probability
-    df[[paste('p', var, sep='')]] <- ifelse(df[[var]]==actual_world[[var]], 
-                                            marginal_pvar, 
-                                            1-marginal_pvar)
-    # re-compute p (the probability of each world) 
-    colnumber <- ncol(df)
-    df$p <- 0
-    for(i in 1:nrow(df)){
-      df[i,]$p <- prod(df[i, ((colnumber/2)+1):colnumber])
+  # if model is CES, perturb the distribution so that C is independent
+  #   (if C is endogenous)
+  if(model=='ces'){
+    # detect if C is endogenous
+    fun <- structural_functions[[var]] # extract function for C
+    args <- names(formals(fun)) # extract function arguments
+    # if variable is endogenous
+    if(length(args)>0){ 
+      # compute marginal probability
+      marginal_pvar <- sum(df[[var]]*df[[paste('p', var, sep='')]]*df$p)
+      # re-compute pc as the marginal probability
+      df[[paste('p', var, sep='')]] <- ifelse(df[[var]]==actual_world[[var]], 
+                                              marginal_pvar, 
+                                              1-marginal_pvar)
+      # re-compute p (the probability of each world) 
+      colnumber <- ncol(df)
+      df$p <- 0
+      for(i in 1:nrow(df)){
+        df[i,]$p <- prod(df[i, ((colnumber/2)+1):colnumber])
+      }
     }
   }
+  
   
   
   # select model and compute score

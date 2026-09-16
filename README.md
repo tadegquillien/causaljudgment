@@ -105,7 +105,7 @@ faster. First it is useful to describe what this sampling process would look
 like (this will help understand what the analytical computation is trying to
 formalize).
 
-We sample each counterfactual world by doing the following:
+For the CES model, we sample each counterfactual world by doing the following:
 
 1) Sample each exogenous variable according to the Lucas-Kemp process
 (see Lucas & Kemp, 2015; Quillien & Lucas, 2023). That is, each exogenous 
@@ -113,8 +113,7 @@ variable $X$ is sampled with probability $s\mathbb{I}(X=x)+(1-s)P(X=x)$, where
 $P(X=x)$ is the prior probability of $X=x$, $\mathbb{I}(X=x)$ is 1 if $X=x$ in 
 the actual world and 0 otherwise, and $s$ is a free 'stability' parameter 
 controlling to what extent the simulation process is biased to actual-world 
-values of the variables. For the NS model we typically use $s=0$; for the CES
-model values around $s=.7$ usually give a good fit to empirical data.
+values of the variables. Values around $s=.7$ usually give a good fit to empirical data.
 
 2) If $C$ is endogenous, sample the value of $C$ by making a random intervention
 on $C$, where $C$ is sampled from $p(C)$. $p(C)$ is the marginal probability of $C$: it
@@ -126,7 +125,8 @@ structural equations.
 
 The distribution over counterfactual worlds that we wish to compute is the
 relative frequency of worlds simulated this way, as the number of samples
-goes to infinity.
+goes to infinity. For the NS model we do the same thing, except that we don't 
+perform step 2, and we typically set $s=0$ in step 1.
 
 To compute this probability distribution analytically, we do the following. We list each possible world (i.e. combination of variable values) as a row in a table. We then assign a probability to each world:
 
@@ -134,9 +134,11 @@ To compute this probability distribution analytically, we do the following. We l
    
 2) For each endogenous variable $X$, we compute $p(X=x|\text{pa}(X))$ as 0 or 1, depending on whether $X=x$ is consistent with the value of the variable's parents (i.e. $\text{pa}(X)$ ) in the current world. (For example if we have $A := B$, and in the current world $A=1$ but $B=0$, then $p(B=0|\text{pa}(B))$ is 0). Note that since we are using SCMs with fully observed variables the conditional probabilities here are deterministic.
    
-3) We compute a probability $p(w)$ for the whole world by using the factorization defined by the network structure, i.e. $p(w)=\prod_{V} p(V|\text{pa}(V))$. Note that if $V$ is exogenous then $p(V|\text{pa}(V)) = p(V|\emptyset) = p(V)$
+3) We compute a probability $p(w)$ for the whole world by using the factorization defined by the network structure, i.e. $p(w)=\prod_{V} p(V|\text{pa}(V))$. Note that if $V$ is exogenous then $p(V|\text{pa}(V)) = p(V|\emptyset) = p(V)$.
 
 4) If $C$ is an endogenous variable, we must perform an additional step to ensure that the distribution reflects the fact that $C$'s value is set by interventions. We first compute the marginal probability $p(C=c)$ in the distribution we just computed. Then we replace $p(C=c|\text{pa}(C))$ with $p(C=c)$ in every world. Doing this ensures that the probability of $C=c$ is now independent from the value of $C$'s parents, as required by the fact that $C$ is set by interventions. After doing this, we now re-compute the probability of each world.
+
+For the NS model we do the same thing but without step 4.
 
 After we have obtained the probability distribution over counterfactual worlds, it is easy to analytically compute the correlation between $C=c$ and $E=e$ in this distribution (for the CES model). We can also analytically compute Necessity and Sufficiency (for the NS model). See [here](https://tadegquillien.github.io/causaljudgment/articles/background.html#technical-description-of-the-model-implementations) for more details on these computations.
 

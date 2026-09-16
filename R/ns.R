@@ -158,7 +158,12 @@ compute_sufficiency <- function(var, outcome, actual_world, causal_model, d){
   # filter for worlds that have C=0, E=0
   base <- d %>% filter(!!sym(outcome)==1-actual_world[[outcome]],
                        !!sym(var)==1-actual_world[[var]])
-  
+  # if such worlds don't exist, return NA and print a warning
+  if (nrow(base) == 0 || sum(base$p) == 0) {
+    warning(sprintf("P(%s=%d, %s=%d) = 0 in this model; sufficiency is undefined for this actual world.",
+                    outcome, 1-actual_world[[outcome]], var, 1-actual_world[[var]]))
+    return(NA_real_)
+  }
   # select all other variables except for C and E
   other_vars <- names(d)
   other_vars <- setdiff(other_vars, c(outcome, var))
