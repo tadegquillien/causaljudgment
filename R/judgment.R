@@ -81,7 +81,8 @@ compute_judgment <- function(var, outcome, causal_model, actual_world,
     # if variable is endogenous
     if(length(args)>0){ 
       # compute marginal probability
-      marginal_pvar <- sum(df[[var]]*df[[paste('p', var, sep='')]]*df$p)
+      marginal_pvar <- sum((df[[var]]==actual_world[[var]])*
+                             df[[paste('p', var, sep='')]]*df$p)
       # re-compute pc as the marginal probability
       df[[paste('p', var, sep='')]] <- ifelse(df[[var]]==actual_world[[var]], 
                                               marginal_pvar, 

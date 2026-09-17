@@ -123,3 +123,21 @@ test_that("CES doesn't judge that ¬E causes ¬C", {
   )
   
 })
+
+
+test_that("CES handles endogenous variables with value 0", {
+  
+  cm <- list(a=.6, u_e=.9,
+             c='a', e='c&u_e')
+  aw <- list(a=0, u_e=0,
+             c=0, e=0)
+  
+  expect_equal(
+    compute_judgment('c', 'e', cm, aw, 'ces', 0),
+    0.8846517,
+    tolerance = 1e-7
+  )
+  
+  
+  
+})
