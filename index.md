@@ -3,7 +3,9 @@
 The `causaljudgment` package computes the predictions of computational
 models of causal judgment. Currently two models are implemented: the
 Counterfactual Effect Size (CES) model (Quillien & Lucas, 2023) and the
-Necessity-Sufficiency (NS) model (Icard, Kominsky & Knobe, 2017).
+Necessity-Sufficiency (NS) model (Icard, Kominsky & Knobe, 2017). You
+can use the package in R (see below) or with the [interactive
+app](https://tadegquillien.shinyapps.io/causaljudgment-shiny/).
 
 In this file, we give examples of how to compute causal judgments,
 describe current limitations, and then (for interested readers) give a
