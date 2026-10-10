@@ -1,0 +1,1 @@
+utils::globalVariables(c("p", "weight", "s.p"))

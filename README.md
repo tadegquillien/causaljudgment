@@ -10,6 +10,11 @@ In this file, we give examples of how to compute causal judgments, describe curr
 First, install and load the package:
 
 ```r
+install.packages("causaljudgment")
+library(causaljudgment)
+```
+Alternatively you can install the development version from Github:
+```r
 install.packages("remotes")
 remotes::install_github("tadegquillien/causaljudgment")
 library(causaljudgment)
